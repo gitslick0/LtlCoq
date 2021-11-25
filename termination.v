@@ -20,7 +20,12 @@
 
 Section termination.
 
-Require Export ltl.
+(*SL 17.11.2021 Added Theorem/Lemma names as [ident] after cofix tactics*)
+
+(*Require Export ltl.*)
+(*SL 17.11.2021 Require Export didn't work for me*)
+Load ltl.
+
 Require Import Relations.
 
 Variables (Alpha : Set) (state : Set) (r : relation Alpha)
@@ -110,7 +115,7 @@ Lemma wf_leadsto_rule :
       (fun s : state => A s /\ (exists t : Alpha, meas s t)))
    (state2stream_formula B) (state2stream_formula C) str.
 
-intros A B C; cofix.
+intros A B C; cofix wf_leadsto_rule.
 intro str; case str; intros s tl H; constructor; eauto.
 unfold leads_to_via in wf_leadsto_rule; unfold implies in wf_leadsto_rule;
  apply wf_leadsto_rule.
