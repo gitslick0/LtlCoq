@@ -21,7 +21,13 @@
 
 Section leads_to.
 
-Require Export ltl.
+(*SL 17.11.2021 Added Lemma/Theorem names as [ident] after the cofix tactics*)
+
+(*Require Export ltl.*)
+(*SL 17.11.2021 Require Export didn't work for me*)
+
+Load ltl.
+
 Variable state label : Set.
     
 
@@ -57,7 +63,7 @@ Lemma trans_leads_to :
  leads_to_via C D E str ->
  leads_to_via (fun str : stream state => A str \/ C str)
    (fun str : stream state => B str \/ D str) E str.
-intros A B C D E; cofix.
+intros A B C D E; cofix trans_leads_to.
 intro str; case str; clear str.
 intros s str H1 H2; constructor.
 intro H; elim H; clear H.

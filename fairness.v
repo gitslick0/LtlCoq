@@ -20,7 +20,11 @@
 
 Section fairness.
 
-Require Import congruence.
+(*Added Theorem/Lemma names after cofix tactic*)
+
+(*Require Import congruence.*)
+(*SL 17.11.2021 Require Import didn't work for me*)
+Load congruence.
 
 Variables (state label : Set) (transition : label -> relation state)
   (fair : label -> Prop).
@@ -48,7 +52,7 @@ apply
              fair_step transition fair (head_str str')
                (head_str (tl_str str')))); auto.
 clear H_fairstr.
-generalize str; clear str; unfold implies in |- *; cofix.
+generalize str; clear str; unfold implies in |- *; cofix strong_fairstr_implies_fairstr.
 intros str; case str; clear str.
 constructor; auto.
 clear strong_fairstr_implies_fairstr.
