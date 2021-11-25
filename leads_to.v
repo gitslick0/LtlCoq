@@ -47,8 +47,10 @@ generalize H_always; clear H_always.
 unfold leads_to_via in |- *; unfold implies in |- *.
 elim (H_until H_A); clear H_until H_A str.
 intros str H_C H_always; inversion H_always.
+(*
 rewrite H1 in H; rewrite H1.
-elim (H H_C); clear H H0 H1 s0 str0 H_always H_C str.
+*)
+elim (C_always3 H_C); clear C_always3 C_always4 (*H1 s0 str0*) H_always H_C str.
 intros str E_str; constructor 1; assumption.
 intros s str D_str until_D_E until_or; constructor 2; auto.
 intros s str B_str until_B_C H_always_until H_always; constructor 2; auto.
@@ -71,7 +73,7 @@ inversion_clear H1.
 intro H_A; eauto.
 inversion_clear H2.
 intro H_C.
-elim (H H_C); clear H.
+elim (C_always3 H_C); clear C_always3.
 constructor 1; auto.
 constructor 2; auto.
 unfold leads_to_via in trans_leads_to; unfold implies in trans_leads_to.

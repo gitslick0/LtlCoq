@@ -24,6 +24,7 @@ Require Export Relations.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
+Set primitive Projections.
 
 Variables (state : Set) (label : Set) (init_state : state -> Prop)
   (transition : label -> relation state) (fair : label -> Prop). 
@@ -43,10 +44,11 @@ Inductive none_or_one_step (s : state) : state -> Prop :=
 
 (********************************** Streams *********************************)
 
-CoInductive stream : Set :=
-    cons_str : state -> stream -> stream.
+CoInductive stream : Set := Conn {hdn : state; tln : stream}.
 
-Definition head_str (str : stream) : state :=
+(*Axiom stream_eta : forall str : stream, str = Conn (hdn str) (tln str).*)
+
+(*Definition head_str (str : stream) : state :=
   match str with
   | cons_str s _ => s
   end.
@@ -55,13 +57,14 @@ Definition tl_str (str : stream) : stream :=
   match str with
   | cons_str _ tl => tl
   end.
+*)
 
 Definition stream_formula := stream -> Prop.
 
 Definition state_formula := state -> Prop. 
 
 Definition state2stream_formula (P : state_formula) : stream_formula :=
-  fun str => P (head_str str).
+  fun str => P (hdn str).
 
 Definition and (P Q : stream_formula) : stream_formula :=
   fun str => P str /\ Q str.
@@ -75,39 +78,48 @@ Definition leads_to (P Q : state_formula) : Prop :=
 (****************************** LTL basic operators *************************)
 
 Definition next (P : stream_formula) : stream_formula :=
-  fun str => P (tl_str str).
+  fun str => P (tln str).
 
+(*
 CoInductive always (P : stream_formula) : stream -> Prop :=
     C_always :
       forall (s0 : state) (str : stream),
       P (cons_str s0 str) -> always P str -> always P (cons_str s0 str).
+*)
+
+CoInductive always (P : stream_formula) (str : stream) : Prop :=
+  {C_always1 : P (str); C_always2 : always (P) (tln str)}.
 
 Definition trace : stream -> Prop :=
   always
     (fun str : stream =>
-     none_or_one_step (head_str str) (head_str (tl_str str))).
+     none_or_one_step (hdn str) (hdn (tln str))).
             
 Definition run (str : stream) : Prop :=
-  init_state (head_str str) /\ trace str.
+  init_state (hdn str) /\ trace str.
 
 Inductive eventually (P : stream_formula) : stream -> Prop :=
   | ev_h : forall str : stream, P str -> eventually P str
   | ev_t :
       forall (s : state) (str : stream),
-      eventually P str -> eventually P (cons_str s str).
+      eventually P str -> eventually P (Conn s str).
 
 Inductive until (P Q : stream_formula) : stream -> Prop :=
   | until_h : forall str : stream, Q str -> until P Q str
   | until_t :
       forall (s : state) (str : stream),
-      P (cons_str s str) -> until P Q str -> until P Q (cons_str s str).
+      P (Conn s str) -> until P Q str -> until P Q (Conn s str).
 
-CoInductive unless (P Q : stream_formula) : stream -> Prop :=
+CoInductive unless (P Q : stream_formula) (str : stream) : Prop :=
+  { unless' : (Q str) \/ (P str -> unless P Q (tln str))}.
+
+
+(*CoInductive unless (P Q : stream_formula) : stream -> Prop :=
   | unless_h : forall str : stream, Q str -> unless P Q str
   | unless_t :
       forall (s : state) (str : stream),
       P (cons_str s str) -> unless P Q str -> unless P Q (cons_str s str).
-
+*)
 
 (****************************** LTL derived operators ***********************)
 
@@ -140,7 +152,7 @@ Definition once_until (P Q : stream_formula) : stream -> Prop :=
 Definition fairness (a : label) (str : stream) : Prop :=
   infinitely_often (state2stream_formula (enabled (transition a))) str ->
   eventually
-    (fun str : stream => transition a (head_str str) (head_str (tl_str str)))
+    (fun str : stream => transition a (hdn str) (hdn (tln str)))
     str.
 
 Inductive fair_step (s1 s2 : state) : Prop :=
@@ -150,13 +162,13 @@ Inductive fair_step (s1 s2 : state) : Prop :=
 Definition fairstr : stream -> Prop :=
   infinitely_often
     (fun str =>
-     enabled fair_step (head_str str) ->
-     fair_step (head_str str) (head_str (tl_str str))).
+     enabled fair_step (hdn str) ->
+     fair_step (hdn str) (hdn (tln str))).
 
 Definition strong_fairstr (str : stream) : Prop :=
   always
     (eventually
-       (fun str' => fair_step (head_str str') (head_str (tl_str str')))) str.
+       (fun str' => fair_step (hdn str') (hdn (tln str')))) str.
      
 (************************************  Safety *******************************)
 

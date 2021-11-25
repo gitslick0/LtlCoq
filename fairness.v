@@ -49,8 +49,8 @@ apply
   with
     (P := eventually
             (fun str' : stream state =>
-             fair_step transition fair (head_str str')
-               (head_str (tl_str str')))); auto.
+             fair_step transition fair (hdn str')
+               (hdn (tln str')))); auto.
 clear H_fairstr.
 generalize str; clear str; unfold implies in |- *; cofix strong_fairstr_implies_fairstr.
 intros str; case str; clear str.
@@ -61,7 +61,7 @@ apply
  implies_eventually
   with
     (P := fun str' : stream state =>
-          fair_step transition fair (head_str str') (head_str (tl_str str')));
+          fair_step transition fair (hdn str') (hdn (tln str')));
  try assumption.
 clear H.
 apply lift_implies_stream; auto.

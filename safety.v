@@ -47,10 +47,10 @@ Lemma always_assumption :
 intros P Q; cofix always_assumption.
 intros H_Q_P str.
 case str; clear str.
-intros s str always_Q.
-constructor; auto.
-apply always_assumption; auto.
-inversion always_Q; assumption.
+intros hdn0 tln0 always_Q.
+constructor.
+  - auto.
+  - apply always_assumption. auto. apply always_Q.
 Qed.
 
 Hint Resolve always_assumption.
@@ -78,7 +78,7 @@ Lemma induct :
  invariant transition P ->
  forall str : stream state,
  trace transition str ->
- P (head_str str) -> always (state2stream_formula P) str.
+ P (hdn str) -> always (state2stream_formula P) str.
 
 
 intros P Inv; unfold state2stream_formula in |- *; cofix induct; intro str; case str;
@@ -141,7 +141,7 @@ apply
  always_assumption
   with
     (Q := fun str : stream state =>
-          none_or_one_step transition (head_str str) (head_str (tl_str str)));
+          none_or_one_step transition (hdn str) (hdn (tln str)));
  assumption.
 Qed.
 

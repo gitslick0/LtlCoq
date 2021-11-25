@@ -67,6 +67,7 @@ intros str H'.
 apply lift_imp with (P := P); assumption.
 Qed.
 
+(*
 Lemma implies_eventually :
  forall (P Q : stream_formula state) (str : stream state),
  implies P Q str -> eventually P str -> eventually Q str.
@@ -79,6 +80,26 @@ inversion H2.
 constructor 1.
 apply H.
 rewrite H3; assumption.
+intros s str H_P H_rec H_implies.
+constructor 2.
+apply H_rec.
+inversion_clear H_implies.
+auto.
+Qed.
+*)
+
+Lemma implies_eventually :
+ forall (P Q : stream_formula state) (str : stream state),
+ implies P Q str -> eventually P str -> eventually Q str.
+intros P Q str H1 H2.
+generalize H1; clear H1.
+elim H2; clear H2; clear str.
+intros str H1 H2.
+unfold implies in H2.
+inversion H2.
+constructor 1. apply C_always3. apply H1.
+(*apply H.
+rewrite H3; assumption.*)
 intros s str H_P H_rec H_implies.
 constructor 2.
 apply H_rec.
@@ -189,8 +210,8 @@ elim H; clear H; clear str.
 intros str HQ HP Himplie.
 constructor 1.
 inversion Himplie.
-apply H.
-rewrite H1; auto.
+apply C_always3. auto.
+(*rewrite H1; auto.*)
 intros s str HP Huntil H_rec HIP HIQ.
 constructor 2.
 inversion HIP; auto.
