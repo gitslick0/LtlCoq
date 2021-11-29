@@ -83,19 +83,16 @@ Lemma induct :
  trace transition str ->
  P (hdn str) -> always (state2stream_formula P) str.
 
-
+Proof.
 intros P Inv; unfold state2stream_formula in |- *; cofix induct; intro str. (* case str;
  simpl in |- *. *)
 intros Htrace Hhead; constructor.
   - try assumption.
   - apply induct; clear induct.
     --  inversion Htrace; assumption.
-    --  generalize Htrace. (*case tl; simpl in |- *.
+    --  generalize Htrace. clear Htrace; intro Htrace. (*case tl; simpl in |- *.
         clear Htrace tl; intros h' tl Htrace.*)
-        inversion_clear Htrace. intro Htrace. apply inv_clos with (s := hdn (tln str)).
-        --- auto.
-        --- 
-(* Need stream_eta equality instead of case tl probably*)
+        inversion_clear Htrace. apply inv_clos with (s := hdn str); auto.
 Qed.
 
 

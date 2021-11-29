@@ -35,8 +35,7 @@ Variables (state : Set) (label : Set) (init_state : state -> Prop)
     Needed this for proof of one_step_leads_to in liveness.v *)
 
 Inductive step (s t : state) : Prop :=
-    |C_steprefl : (s = t) -> step s t
-    |C_trans : forall a : label, transition a s t -> step s t.
+    C_trans : forall a : label, transition a s t -> step s t.
 
 Inductive enabled (r : relation state) (s : state) : Prop :=
     c_pos_trans : forall t : state, r s t -> enabled r s.
@@ -102,18 +101,32 @@ Definition trace : stream -> Prop :=
 Definition run (str : stream) : Prop :=
   init_state (hdn str) /\ trace str.
 
+
 Inductive eventually (P : stream_formula) : stream -> Prop :=
   | ev_h : forall str : stream, P str -> eventually P str
   | ev_t :
       forall (s : state) (str : stream),
       eventually P str -> eventually P (Conn s str).
+(*
+Inductive eventually (P : stream_formula) : stream -> Prop :=
+  | ev_h : forall str : stream, P str -> eventually P str
+  | ev_t : 
+      forall (str : stream),
+      eventually P (tln str) -> eventually P str.
+*)
 
 Inductive until (P Q : stream_formula) : stream -> Prop :=
   | until_h : forall str : stream, Q str -> until P Q str
   | until_t :
       forall (s : state) (str : stream),
       P (Conn s str) -> until P Q str -> until P Q (Conn s str).
-
+(*
+Inductive until (P Q : stream_formula) : stream -> Prop :=
+  | until_h : forall str : stream, Q str -> until P Q str
+  | until_t : 
+      forall (str : stream),
+      P str -> until P Q (tln str) -> until P Q str.
+*)
 CoInductive unless (P Q : stream_formula) (str : stream) : Prop :=
   { unless' : (Q str) \/ (P str -> unless P Q (tln str))}.
 

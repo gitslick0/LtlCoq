@@ -53,7 +53,7 @@ apply
                (hdn (tln str')))); auto.
 clear H_fairstr.
 generalize str; clear str; unfold implies in |- *; cofix strong_fairstr_implies_fairstr.
-intros str; case str; clear str.
+intros str. (* case str; clear str.*)
 constructor; auto.
 clear strong_fairstr_implies_fairstr.
 intro H.
