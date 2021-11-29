@@ -24,15 +24,19 @@ Require Export Relations.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
-Set primitive Projections.
+Set Primitive Projections.
 
 Variables (state : Set) (label : Set) (init_state : state -> Prop)
   (transition : label -> relation state) (fair : label -> Prop). 
 
 (**************************** transitions  **********************************)
 
+(*  Added reflexicity to definition of step, i.e. pausing is always a viable step.
+    Needed this for proof of one_step_leads_to in liveness.v *)
+
 Inductive step (s t : state) : Prop :=
-    C_trans : forall a : label, transition a s t -> step s t.
+    |C_steprefl : (s = t) -> step s t
+    |C_trans : forall a : label, transition a s t -> step s t.
 
 Inductive enabled (r : relation state) (s : state) : Prop :=
     c_pos_trans : forall t : state, r s t -> enabled r s.
@@ -46,7 +50,7 @@ Inductive none_or_one_step (s : state) : state -> Prop :=
 
 CoInductive stream : Set := Conn {hdn : state; tln : stream}.
 
-(*Axiom stream_eta : forall str : stream, str = Conn (hdn str) (tln str).*)
+Axiom stream_eta : forall str : stream, str = Conn (hdn str) (tln str).
 
 (*Definition head_str (str : stream) : state :=
   match str with

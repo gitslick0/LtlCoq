@@ -46,11 +46,13 @@ Lemma always_assumption :
 
 intros P Q; cofix always_assumption.
 intros H_Q_P str.
-case str; clear str.
-intros hdn0 tln0 always_Q.
+(*case str; clear str.*)
+intro always_Q.
 constructor.
   - auto.
-  - apply always_assumption. auto. apply always_Q.
+  - apply always_assumption.
+    -- auto.
+    -- apply always_Q.
 Qed.
 
 Hint Resolve always_assumption.
@@ -73,6 +75,7 @@ simple induction 2; auto.
 clear H0 t; intros t Hstep Ps; apply H with (s := s); assumption.
 Qed.
 
+
 Lemma induct :
  forall P : state_formula state,
  invariant transition P ->
@@ -81,14 +84,18 @@ Lemma induct :
  P (hdn str) -> always (state2stream_formula P) str.
 
 
-intros P Inv; unfold state2stream_formula in |- *; cofix induct; intro str; case str;
- simpl in |- *.
-intros h tl Htrace Hhead; constructor; try assumption.
-apply induct; clear induct.
-inversion Htrace; assumption.
-generalize Htrace; case tl; simpl in |- *.
-clear Htrace tl; intros h' tl Htrace.
-inversion_clear Htrace; apply inv_clos with (s := h); assumption.
+intros P Inv; unfold state2stream_formula in |- *; cofix induct; intro str. (* case str;
+ simpl in |- *. *)
+intros Htrace Hhead; constructor.
+  - try assumption.
+  - apply induct; clear induct.
+    --  inversion Htrace; assumption.
+    --  generalize Htrace. (*case tl; simpl in |- *.
+        clear Htrace tl; intros h' tl Htrace.*)
+        inversion_clear Htrace. intro Htrace. apply inv_clos with (s := hdn (tln str)).
+        --- auto.
+        --- 
+(* Need stream_eta equality instead of case tl probably*)
 Qed.
 
 
@@ -115,19 +122,27 @@ Lemma always_on_run :
  run init_state transition str -> always F str -> always P str.
 
 
+Proof.
 unfold safe in |- *; unfold run in |- *; intros F P I H_safe H str str_safe;
  elim str_safe.
 intro h; clear h; cut (always I str); auto.
 clear str_safe; generalize str; clear str H_safe.
 cofix always_on_run.
-intro str; case str; clear str.
+intros str always_I H_trace always_F.
+inversion always_I.
+inversion H_trace.
+inversion always_F.
+constructor.
+  - apply H; auto.
+  - apply always_on_run; auto.
+(*intro str; case str; clear str.
 intros s str always_I H_trace always_F.
 inversion always_I.
 inversion H_trace.
 inversion always_F.
 constructor.
 2: apply always_on_run; auto. 
-apply H; auto.
+apply H; auto.*)
 Qed.
 
 Lemma trace_assumption :

@@ -102,7 +102,6 @@ constructor 2; assumption.
 Qed.
 
 
-
 Lemma one_step_leads_to :
  forall P Q : state_formula state,
  (forall s : state, P s -> enabled (fair_step transition fair) s) ->
@@ -121,11 +120,13 @@ inversion_clear H_fair.
 clear H_trace H_P C_always4 (*str*).
 elim C_always3; clear C_always3.
 
-(*clear s0 str0;*)clear str. intro str; case str. 
-clear str; intros s str H_fair H_trace H_P; constructor 2; auto.
-constructor 1; unfold state2stream_formula in |- *;
- apply leads_P_Q with (s := s); auto.
-elim H_fair.
+(*clear s0 str0;*)clear str. intro str. (*case str. 
+clear str;*) intros (*s str*) H_fair H_trace H_P. constructor. unfold state2stream_formula. apply leads_P_Q with (s := hdn str). 
+  - auto.
+  - (*constructor 2.*) auto. apply C_steprefl. reflexivity.
+  - constructor 1; unfold state2stream_formula in |- *;
+    apply leads_P_Q with (s := s); auto. simpl. apply C_steprefl. reflexivity. 
+(*elim H_fair.
 intros a fair_a H_trans; clear fair_a; apply C_trans with (a := a); auto.
 apply H_enabled; auto.
 unfold state2stream_formula in |- *; simpl in |- *;
@@ -136,7 +137,7 @@ constructor 2; auto.
 apply H1; auto.
 simpl in H. rewrite <- H; assumption.
 simpl in H; constructor 2; auto.
-constructor 1; apply leads_P_Q with (s := s1); trivial.
+constructor 1; apply leads_P_Q with (s := s1); trivial.*)
 Qed.
 
 Hint Resolve one_step_leads_to.
@@ -154,8 +155,8 @@ Lemma always_one_step_leads_to :
 unfold once_until in |- *; unfold leads_to_via in |- *.
 intros P Q H_enabled leads_P_Q; unfold implies in |- *.
 cofix always_one_step_leads_to.
-intro str; case str; intros s str'; case str'.
-intros t tl H_trace H_fair; constructor.
+intro str. (*case str; intros s str'; case str'.*)
+intros (*t tl*) H_trace H_fair. constructor.
 intro H.
 apply one_step_leads_to; try assumption.
 inversion_clear H_trace; inversion_clear H_fair.

@@ -66,8 +66,8 @@ Lemma trans_leads_to :
  leads_to_via (fun str : stream state => A str \/ C str)
    (fun str : stream state => B str \/ D str) E str.
 intros A B C D E; cofix trans_leads_to.
-intro str; case str; clear str.
-intros s str H1 H2; constructor.
+intro str. (*case str; clear str.*)
+intros (*s str*) H1 H2; constructor.
 intro H; elim H; clear H.
 inversion_clear H1.
 intro H_A; eauto.

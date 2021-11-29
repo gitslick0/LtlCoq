@@ -20,10 +20,6 @@
 
 Section termination.
 
-(*SL 17.11.2021 Added Theorem/Lemma names as [ident] after cofix tactics*)
-
-(*Require Export ltl.*)
-(*SL 17.11.2021 Require Export didn't work for me*)
 Load ltl.
 
 Require Import Relations.
@@ -44,7 +40,7 @@ Lemma wf_leadsto :
     (state2stream_formula
        (fun s : state => A s /\ (exists t : Alpha, meas s t /\ r t v) \/ C s))
     str) ->
- A (head_str str) /\ (exists v : Alpha, meas (head_str str) v) ->
+ A (hdn str) /\ (exists v : Alpha, meas (hdn str) v) ->
  until (state2stream_formula B) (state2stream_formula C) str.
 
 
@@ -64,15 +60,15 @@ cut
            A s /\ (exists t : Alpha, meas s t /\ r t v0) \/ C s)) str) str);
  auto.
 intro h; inversion h; clear h.
-rewrite H2; rewrite H2 in H0; generalize H1; replace str0 with (tl_str str).
-2: rewrite <- H2; auto.
-clear H1 H2 s0 str0; unfold state2stream_formula in H0;
+(*rewrite H2; rewrite H2 in H0;*) generalize C_always4. (*replace str0 with (tln str).*)
+(*2: rewrite <- H2; auto.*)
+clear (*H1 H2 s0 str0*) C_always4. unfold state2stream_formula in C_always3.
  cut
-  (until (fun str : stream state => B (head_str str))
+  (until (fun str : stream state => B (hdn str))
      (fun str : stream state =>
-      A (head_str str) /\ (exists t : Alpha, meas (head_str str) t /\ r t v0) \/
-      C (head_str str)) str); try apply H0; auto.
-clear H0; intro H_until; generalize H; elim H_until. 
+      A (hdn str) /\ (exists t : Alpha, meas (hdn str) t /\ r t v0) \/
+      C (hdn str)) str); try apply C_always3; auto.
+clear C_always3. intro H_until. generalize H; elim H_until. 
 clear H H_until A_head H_meas str; intros str H H_always H_always_v0; elim H;
  clear H.
 intro H; elim H; clear H. 
@@ -84,7 +80,7 @@ clear H_rec H_acc H_wf H A_head H_meas H_until str.
 intros s str H_B H_until H_rec H_always.
 constructor 2; auto.
 apply H_rec.
-intro v;
+intro v.
  cut
   (always
      (fun str : stream state =>
@@ -93,11 +89,11 @@ intro v;
         (state2stream_formula
            (fun s : state =>
             A s /\ (exists t : Alpha, meas s t /\ r t v) \/ C s)) str)
-     (cons_str s str)); auto. 
-clear H_always; intro H_always; inversion H_always; assumption.
-simpl in H1; inversion H1; rewrite H2; generalize H0;
- replace str0 with (tl_str str); auto.
-rewrite <- H2; auto.
+     (Conn s str)); auto. 
+clear H_always. intro H_always. inversion H_always. assumption.
+simpl in C_always4; inversion C_always4. (*rewrite H2;*) generalize C_always5.
+ (*replace str0 with (tl_str str);*) auto.
+(*rewrite <- H2; auto.*)
 Qed.
 
 Hint Resolve wf_leadsto.
@@ -116,17 +112,17 @@ Lemma wf_leadsto_rule :
    (state2stream_formula B) (state2stream_formula C) str.
 
 intros A B C; cofix wf_leadsto_rule.
-intro str; case str; intros s tl H; constructor; eauto.
+intro str. (*case str;*) intros (*s tl*) H; constructor; eauto.
 unfold leads_to_via in wf_leadsto_rule; unfold implies in wf_leadsto_rule;
  apply wf_leadsto_rule.
-intro v;
+intro v.
  cut
   (leads_to_via (state2stream_formula (fun s : state => A s /\ meas s v))
      (state2stream_formula B)
      (state2stream_formula
         (fun s : state => A s /\ (exists t : Alpha, meas s t /\ r t v) \/ C s))
-     (cons_str s tl)); auto.
-unfold leads_to_via in |- *; unfold implies in |- *; intro H0;
+     ((*Conn s tl*) str)); auto.
+unfold leads_to_via in |- *; unfold implies in |- *. intro H0.
  inversion_clear H0; assumption.
 Qed.
 
