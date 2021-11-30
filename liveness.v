@@ -50,7 +50,7 @@ intros P Q str H_until.
 elim H_until; clear H_until; clear str.
 intros str H.
 constructor 1; assumption.
-intros s str H_P H_until H_ev.
+intros (*s*) str H_P H_until H_ev.
 constructor 2; assumption.
 Qed.
 
@@ -64,8 +64,8 @@ unfold once_until in |- *; unfold is_followed in |- *;
 intros P Q str H_always H_P.
 inversion H_always.
 apply until_eventually with (P := P).
-apply H.
-rewrite H1; assumption.
+apply C_always3.
+(*rewrite H1;*) assumption.
 Qed.
 
 Lemma followed_until :
@@ -82,7 +82,7 @@ intros str' not_P_str' P_str'; absurd (P str'); assumption.
 intros s str' ev_P_str' H_P_until P_str'.
 constructor 2; try assumption.
 elim (dec str'); intro Pstr'.
-apply H_P_until; assumption.
+apply H_P_until. assumption.
 constructor 1; assumption.
 constructor 1; assumption.
 Qed.
@@ -96,12 +96,12 @@ Lemma eventually_until :
 intros P str dec; simple induction 1; clear H str.
 intros str H_P; constructor 1; assumption.
 intros s str H_ev H_until.
-elim (dec (cons_str s str)); intro H_P.
-constructor 1; assumption.
-constructor 2; assumption.
+elim (dec {| hdn := s; tln := str|}). intro H_P.
+  - constructor 1. assumption.
+  - constructor 2; assumption.
 Qed.
 
-
+(* Careful, here I used the stream_eta Axiom. Want to change this in the future if possible.*)
 
 Lemma one_step_leads_to :
  forall P Q : state_formula state,
@@ -118,26 +118,28 @@ unfold fairstr in |- *; unfold infinitely_often in |- *;
  unfold leads_to in |- *.
 intros P Q H_enabled leads_P_Q str H_trace H_fair H_P; generalize H_trace H_P.
 inversion_clear H_fair.
-clear H_trace H_P H0 str.
-elim H; clear H.
+clear H_trace H_P C_always4 (*str*).
+elim C_always3; clear C_always3.
 
-clear s0 str0; intro str; case str. 
-clear str; intros s str H_fair H_trace H_P; constructor 2; auto.
-constructor 1; unfold state2stream_formula in |- *;
- apply leads_P_Q with (s := s); auto.
-elim H_fair.
-intros a fair_a H_trans; clear fair_a; apply C_trans with (a := a); auto.
-apply H_enabled; auto.
-unfold state2stream_formula in |- *; simpl in |- *;
- intros s1 str1 H_ind H1 H_trace H_P.
-inversion_clear H_trace.
-inversion H.
-constructor 2; auto.
-apply H1; auto.
-simpl in H2; rewrite <- H2; assumption.
-simpl in H2; constructor 2; auto.
-constructor 1; apply leads_P_Q with (s := s1); trivial.
+(*clear s0 str0;*)clear str. intro str. (*case str. 
+clear str;*) intros (*s str*) H_fair H_trace H_P.
+  - rewrite -> stream_eta. constructor 2.
+      -- rewrite <- stream_eta. assumption.
+      -- constructor 1. unfold state2stream_formula in |-*. apply leads_P_Q with (s := hdn str).
+          --- auto.
+          --- elim H_fair. intros a fair_a H_trans. clear fair_a.
+                ---- apply C_trans with (a := a). auto.
+                ---- apply H_enabled. auto.
+  - unfold state2stream_formula in |- *; simpl in |- *.
+    intros s1 str1 H_ind H1 H_trace H_P.
+    inversion_clear H_trace.
+    inversion C_always3.
+      -- constructor 2.
+          --- auto.
+          --- apply H1; auto. simpl in H. rewrite <- H. assumption.
+      -- simpl in H. constructor 2; auto. constructor 1. apply leads_P_Q with (s := s1); assumption.
 Qed.
+
 
 Hint Resolve one_step_leads_to.
 
@@ -154,8 +156,8 @@ Lemma always_one_step_leads_to :
 unfold once_until in |- *; unfold leads_to_via in |- *.
 intros P Q H_enabled leads_P_Q; unfold implies in |- *.
 cofix always_one_step_leads_to.
-intro str; case str; intros s str'; case str'.
-intros t tl H_trace H_fair; constructor.
+intro str. (*case str; intros s str'; case str'.*)
+intros (*t tl*) H_trace H_fair. constructor.
 intro H.
 apply one_step_leads_to; try assumption.
 inversion_clear H_trace; inversion_clear H_fair.
