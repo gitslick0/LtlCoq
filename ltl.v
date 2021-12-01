@@ -49,7 +49,7 @@ Inductive none_or_one_step (s : state) : state -> Prop :=
 
 CoInductive stream : Set := Conn {hdn : state; tln : stream}.
 
-Axiom stream_eta : forall str : stream, str = Conn (hdn str) (tln str).
+(*Axiom stream_eta : forall str : stream, str = Conn (hdn str) (tln str).*)
 
 (*Definition head_str (str : stream) : state :=
   match str with
@@ -101,32 +101,33 @@ Definition trace : stream -> Prop :=
 Definition run (str : stream) : Prop :=
   init_state (hdn str) /\ trace str.
 
-
+(*
 Inductive eventually (P : stream_formula) : stream -> Prop :=
   | ev_h : forall str : stream, P str -> eventually P str
   | ev_t :
       forall (s : state) (str : stream),
       eventually P str -> eventually P (Conn s str).
-(*
+*)
+
 Inductive eventually (P : stream_formula) : stream -> Prop :=
   | ev_h : forall str : stream, P str -> eventually P str
   | ev_t : 
       forall (str : stream),
       eventually P (tln str) -> eventually P str.
-*)
-
+(*
 Inductive until (P Q : stream_formula) : stream -> Prop :=
   | until_h : forall str : stream, Q str -> until P Q str
   | until_t :
       forall (s : state) (str : stream),
       P (Conn s str) -> until P Q str -> until P Q (Conn s str).
-(*
+*)
+
 Inductive until (P Q : stream_formula) : stream -> Prop :=
   | until_h : forall str : stream, Q str -> until P Q str
   | until_t : 
       forall (str : stream),
       P str -> until P Q (tln str) -> until P Q str.
-*)
+
 CoInductive unless (P Q : stream_formula) (str : stream) : Prop :=
   { unless' : (Q str) \/ (P str -> unless P Q (tln str))}.
 

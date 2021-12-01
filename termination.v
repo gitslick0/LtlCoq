@@ -77,7 +77,7 @@ intros v H; elim H; clear H.
 intros H_meas H_r; apply H_rec with (y := v); auto.
 constructor 1; auto.
 clear H_rec H_acc H_wf H A_head H_meas H_until str.
-intros s str H_B H_until H_rec H_always.
+intros (*s*) str H_B H_until H_rec H_always.
 constructor 2; auto.
 apply H_rec.
 intro v.
@@ -89,7 +89,7 @@ intro v.
         (state2stream_formula
            (fun s : state =>
             A s /\ (exists t : Alpha, meas s t /\ r t v) \/ C s)) str)
-     (Conn s str)); auto. 
+     str); auto. 
 clear H_always. intro H_always. inversion H_always. assumption.
 simpl in C_always4; inversion C_always4. (*rewrite H2;*) generalize C_always5.
  (*replace str0 with (tl_str str);*) auto.
