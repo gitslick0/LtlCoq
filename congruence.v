@@ -100,7 +100,7 @@ inversion H2.
 constructor 1. apply C_always3. apply H1.
 (*apply H.
 rewrite H3; assumption.*)
-intros s str H_P H_rec H_implies.
+intros (*s*) str H_P H_rec H_implies.
 constructor 2.
 apply H_rec.
 inversion_clear H_implies.
@@ -211,7 +211,7 @@ constructor 1.
 inversion Himplie.
 apply C_always3. auto.
 (*rewrite H1; auto.*)
-intros s str HP Huntil H_rec HIP HIQ.
+intros (*s*) str HP Huntil H_rec HIP HIQ.
 constructor 2.
 inversion HIP; auto.
 apply H_rec.

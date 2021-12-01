@@ -79,9 +79,9 @@ intros P dec str H_followed; elim (dec str).
 intro P_str; unfold is_followed in H_followed.
 generalize P_str; generalize H_followed; simple induction 1; try assumption.
 intros str' not_P_str' P_str'; absurd (P str'); assumption.
-intros s str' ev_P_str' H_P_until P_str'.
+intros (*s*) str' ev_P_str' H_P_until P_str'.
 constructor 2; try assumption.
-elim (dec str'); intro Pstr'.
+elim (dec (tln str')); intro Pstr'.
 apply H_P_until. assumption.
 constructor 1; assumption.
 constructor 1; assumption.
@@ -95,8 +95,8 @@ Lemma eventually_until :
 
 intros P str dec; simple induction 1; clear H str.
 intros str H_P; constructor 1; assumption.
-intros s str H_ev H_until.
-elim (dec {| hdn := s; tln := str|}). intro H_P.
+intros (*s*) str H_ev H_until.
+elim (dec str). intro H_P.
   - constructor 1. assumption.
   - constructor 2; assumption.
 Qed.
@@ -123,21 +123,21 @@ elim C_always3; clear C_always3.
 
 (*clear s0 str0;*)clear str. intro str. (*case str. 
 clear str;*) intros (*s str*) H_fair H_trace H_P.
-  - rewrite -> stream_eta. constructor 2.
-      -- rewrite <- stream_eta. assumption.
+  - constructor 2. (*rewrite -> stream_eta. constructor 2.*)
+      -- assumption. (*rewrite <- stream_eta. assumption.*)
       -- constructor 1. unfold state2stream_formula in |-*. apply leads_P_Q with (s := hdn str).
           --- auto.
           --- elim H_fair. intros a fair_a H_trans. clear fair_a.
                 ---- apply C_trans with (a := a). auto.
                 ---- apply H_enabled. auto.
   - unfold state2stream_formula in |- *; simpl in |- *.
-    intros s1 str1 H_ind H1 H_trace H_P.
+    intros (*s1*) str1 H_ind H1 H_trace H_P.
     inversion_clear H_trace.
     inversion C_always3.
       -- constructor 2.
           --- auto.
-          --- apply H1; auto. simpl in H. rewrite <- H. assumption.
-      -- simpl in H. constructor 2; auto. constructor 1. apply leads_P_Q with (s := s1); assumption.
+          --- apply H1; auto. simpl in H0. rewrite <- H0. assumption.
+      -- simpl in H. constructor 2; auto. constructor 1. apply leads_P_Q with (s := hdn str1); assumption.
 Qed.
 
 

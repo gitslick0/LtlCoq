@@ -52,8 +52,8 @@ rewrite H1 in H; rewrite H1.
 *)
 elim (C_always3 H_C); clear C_always3 C_always4 (*H1 s0 str0*) H_always H_C str.
 intros str E_str; constructor 1; assumption.
-intros s str D_str until_D_E until_or; constructor 2; auto.
-intros s str B_str until_B_C H_always_until H_always; constructor 2; auto.
+intros (*s*) str D_str until_D_E until_or; constructor 2; auto.
+intros (*s*) str B_str until_B_C H_always_until H_always; constructor 2; auto.
 apply H_always_until; inversion H_always; assumption.
 Qed.
 
