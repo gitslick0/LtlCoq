@@ -1,3 +1,6 @@
+(*  Message for the original file.
+    Modified file created by Stefan Licklederer November 2021 *)
+
 (****************************************************************************)
 (*                                                                          *)
 (*                                                                          *)
@@ -31,8 +34,7 @@ Variables (state : Set) (label : Set) (init_state : state -> Prop)
 
 (**************************** transitions  **********************************)
 
-(*  Added reflexicity to definition of step, i.e. pausing is always a viable step.
-    Needed this for proof of one_step_leads_to in liveness.v *)
+(* Unchanged*)
 
 Inductive step (s t : state) : Prop :=
     C_trans : forall a : label, transition a s t -> step s t.
@@ -114,6 +116,12 @@ Inductive eventually (P : stream_formula) : stream -> Prop :=
   | ev_t : 
       forall (str : stream),
       eventually P (tln str) -> eventually P str.
+
+Inductive eventually' (P : stream_formula) (str : stream) : Prop :=
+  | ev'_h : P str -> eventually' P str
+  | ev'_t : 
+      eventually' P (tln str) -> eventually' P str.
+
 (*
 Inductive until (P Q : stream_formula) : stream -> Prop :=
   | until_h : forall str : stream, Q str -> until P Q str
@@ -128,8 +136,32 @@ Inductive until (P Q : stream_formula) : stream -> Prop :=
       forall (str : stream),
       P str -> until P Q (tln str) -> until P Q str.
 
+Inductive until' (P Q : stream_formula) (str : stream) : Prop :=
+  | until'_h : Q str -> until' P Q str
+  | until'_t : 
+      P str -> until' P Q (tln str) -> until' P Q str.
+
+Check until'_ind.
+
+(*until'_ind
+     : forall (P Q : stream_formula) (P0 : stream -> Prop),
+       (forall str : stream, Q str -> P0 str) ->
+       (forall str : stream,
+        P str -> until' P Q (tln str) -> P0 (tln str) -> P0 str) ->
+       forall str : stream, until' P Q str -> P0 str *)
+
+Check until_ind.
+
+(* until_ind
+     : forall (P Q : stream_formula) (P0 : stream -> Prop),
+       (forall str : stream, Q str -> P0 str) ->
+       (forall str : stream,
+        P str -> until P Q (tln str) -> P0 (tln str) -> P0 str) ->
+       forall s : stream, until P Q s -> P0 s *)
+
+
 CoInductive unless (P Q : stream_formula) (str : stream) : Prop :=
-  { unless' : (Q str) \/ (P str -> unless P Q (tln str))}.
+  { unless' : (Q str) \/ (P str /\ unless P Q (tln str))}.
 
 
 (*CoInductive unless (P Q : stream_formula) : stream -> Prop :=

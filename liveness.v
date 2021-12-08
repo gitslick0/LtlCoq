@@ -102,6 +102,7 @@ elim (dec str). intro H_P.
 Qed.
 
 (* Careful, here I used the stream_eta Axiom. Want to change this in the future if possible.*)
+(* No longer used *)
 
 Lemma one_step_leads_to :
  forall P Q : state_formula state,
